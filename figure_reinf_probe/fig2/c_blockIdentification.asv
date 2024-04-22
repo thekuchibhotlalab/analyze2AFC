@@ -1,0 +1,35 @@
+clear; 
+mice ={'zz054','zz062','zz063','zz066','zz067','zz068','zz069','zz107','zz109','zz111','zz112','zz113','zz115'};
+task = 'puretone'; nMouse = length(mice);
+
+allMouse = fn_getObjPT_bin30(mice);
+learningCurveBin = 30;
+%% 
+mouseRand = rand(1,1000000); mouseRand(mouseRand<0.5) = -1; mouseRand(mouseRand>0.5) = 1;
+biasRand = smoothdata(mouseRand,'movmean',learningCurveBin);
+[~, ~, ~,bareaL] = fn_getBlockOnOff(biasRand>0,biasRand);
+[~, ~, ~,bareaR] = fn_getBlockOnOff(biasRand<0,biasRand);
+barea = [bareaL bareaR]; areaThre = prctile(barea,95);
+
+biasAUC = {};
+for i = 1:length(allMouse)
+    biasAUC{i} = [];
+    for j = 1:length(allMouse{i}.biasBlock.blockL.start)
+        tempIdx = allMouse{i}.biasBlock.blockL.start(j):allMouse{i}.biasBlock.blockL.end(j);
+        biasAUC{i} = [biasAUC{i}, nansum(allMouse{i}.behav.bias(tempIdx))];
+    end 
+
+    for j = 1:length(allMouse{i}.biasBlock.blockR.start)
+        tempIdx = allMouse{i}.biasBlock.blockR.start(j):allMouse{i}.biasBlock.blockR.end(j);
+        biasAUC{i} = [biasAUC{i}, nansum(allMouse{i}.behav.bias(tempIdx))];
+    end 
+
+end
+biasAUC = fn_cell2mat(biasAUC,2);
+figure; hold on; 
+fn_plotHistLine(barea,'histCountArgIn',{0:1/3:10,'Normalization','probability'},...
+    'plotArgIn',{'LineWidth',2,'Color',[0.8 0.8 0.8]});
+
+fn_plotHistLine(biasAUC,'histCountArgIn',{0:1/3:10,'Normalization','probability'},...
+    'plotArgIn',{'LineWidth',2,'Color',fn_wheelColorsPT('Probe')});
+xlim([-0.5 10.5])

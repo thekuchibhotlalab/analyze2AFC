@@ -1,0 +1,31 @@
+%% LOAD ANIMALS
+clear; 
+mice ={'zz054','zz062','zz063','zz066','zz067','zz068','zz069','zz107','zz109','zz111','zz112','zz113','zz115'};
+allMouse = fn_getObjPT(mice);
+mouseMega = wheel2AFCmega(allMouse);
+reinf = mouseMega.loadReinf;
+
+nMouse = size(reinf.acc,2);
+plotLim = 3000;
+
+
+%%
+maxAcc = cellfun(@(x)(max(x.behav.acc)),allMouse,'UniformOutput',true);
+maxAccTrial = []; acc60Trial = [];acc70Trial = [];acc80Trial = [];
+for i = 1:length(allMouse)
+    [~,idx]= max(allMouse{i}.behav.acc); maxAccTrial(i)=idx;
+    [idx]= find(allMouse{i}.behav.acc>0.75,1,'first'); acc80Trial(i)=idx;
+    [idx]= find(allMouse{i}.behav.acc>0.7,1,'first'); acc70Trial(i)=idx;
+    [idx]= find(allMouse{i}.behav.acc>0.55,1,'first'); acc60Trial(i)=idx;
+    meanBiasMid(i)= nanmean(abs(allMouse{i}.behav.bias(acc60Trial(i):acc80Trial(i))));
+end 
+ 
+meanBias = cellfun(@(x)(nanmean(abs(x.behav.bias))),allMouse,'UniformOutput',true);
+
+%figure; scatter(meanBias,maxAccTrial);
+%figure; scatter(meanBias,acc70Trial);
+%figure; scatter(meanBias,maxAcc);
+figure; scatter(meanBiasMid,acc80Trial-acc60Trial);
+figure; [lm,sc] = fn_plotScatterCorr(meanBiasMid,acc80Trial-acc60Trial);
+xlim([0 0.8]); ylim([])
+

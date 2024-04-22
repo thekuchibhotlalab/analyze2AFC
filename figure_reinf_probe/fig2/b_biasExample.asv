@@ -1,0 +1,18 @@
+clear; 
+mice = {'zz109'};
+task = 'puretone'; 
+zz109 = fn_getObjPT_bin30(mice);zz109 = zz109{1};
+%%
+start = 120; finish = 500; biasStart1 = 201; biasEnd1 = 243;
+biasStart2 = 243; biasEnd2 = 375;
+figure; hold on;
+fill([biasStart1 biasStart1:biasEnd1 biasEnd1],[0;zz109.behav.bias(biasStart1:biasEnd1);0],...
+    fn_wheelColorsPT('L',0.4),'EdgeColor','none')
+fill([biasStart2 biasStart:biasEnd biasStart],[0;zz109.behav.bias(biasStart:biasEnd);0],...
+    fn_wheelColorsPT('L',0.4),'EdgeColor','none')
+plot([start finish],[0 0],'Color',[0.8 0.8 0.8],'LineWidth',2)
+plot(start:finish, zz109.behav.bias(start:finish),'LineWidth',2,'Color',fn_wheelColorsPT('bias'));
+xlim([start finish]); ylim([-1 1]); yticks(-1:0.5:1); xticks([120 500])
+
+
+
